@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>我的报名</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <link rel="stylesheet" href="/static/index/libs/weui.min.css">
+  <link rel="stylesheet" href="/static/index/libs/jquery-weui.min.css">
+  <link rel="stylesheet" href="/static/index/libs/index.css">
+</head>
+
+<body class="bg-gray">
+  <div id="app" v-cloak>
+    <div class="likelist order_list">
+      <div class="shopbox likeitem shadow" @click='shopHtml(item.store.id,item.order_status)'
+        v-for='(item,index) in orderlist' :key='index'>
+        <div class="order_status">
+          <div class="status" :style="{color:item.order_status == 1 ? '#09bb07':''}">{{item.status_text}}</div>
+          <div class="time">{{manageTime(item.create_time)}}</div>
+        </div>
+        <div class="storebox">
+          <div class="storeimg"><img :src="item.store.image"></div>
+          <div class="storename">
+            <div class="namebox">
+              <div class="name" :style="{color:item.order_status == 2 ? '#eee':''}">{{item.store.name}}</div>
+              <!-- <div class="like"><img src="/static/index/images/like.png"></div> -->
+            </div>
+            <div class="shop_tips">
+              <p v-for='(data,index) in item.store.tags'>{{data}}</p>
+            </div>
+            <div class="shop_money">
+              <div class="money">{{item.store.price}}元</div>
+              <div class="distance">{{item.distance}}km</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- 缺失页面 -->
+      <div class="padding-xl" v-if='orderlist.length==0'>
+        <div class="emptybox padding-lg text-center">
+          <img src="/static/index/images/empty.png">
+          <div class="text-ml">暂无信息~</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/index/libs/jquery-2.1.4.js"></script>
+  <script src="/static/index/libs/fastclick.js"></script>
+  <script src="/static/index/libs/jquery-weui.min.js"></script>
+  <script src="/static/index/libs/swiper.min.js"></script>
+  <script src="/static/index/libs/vue.min.js"></script>
+  <script src="/static/index/libs/request.js"></script>
+  <script>
+    $(function () {
+      FastClick.attach(document.body);
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            orderlist: [],
+            page: 1
+          }
+        },
+        created() {
+          this.orderlistData();
+        },
+        mounted() {
+          window.addEventListener('scroll', this.scrollToTop)
+        },
+        methods: {
+          // 我的订单
+          async orderlistData() {
+            let that = this;
+            try {
+              const orderlist = await updateResturant({
+                'url': '/order/orderlist',
+                data: {
+                  page: that.page,
+                  size: 12,
+                  lng: JSON.parse(sessionStorage.getItem('getlication')).longitude,
+                  lat: JSON.parse(sessionStorage.getItem('getlication')).latitude
+                }
+              });
+              that.page > 1 ?  that.orderlist =  that.orderlist.concat(orderlist.data) : that.orderlist = orderlist.data;
+            } catch (error) {
+              console.log(error)
+            }
+          },
+          // 解析时间
+          manageTime(timestamp, num = 0) {
+            var date = new Date(timestamp * 1000);
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            second = second < 10 ? ('0' + second) : second;
+            if (num == 0) {
+              return y + '-' + m + '-' + d;
+            } else {
+              return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+            };
+          },
+          // 跳转
+          shopHtml(id, sid) {
+            if (sid != 2) {
+              window.location.href = 'shop.html?id=' + id
+            }
+          },
+          // 上拉刷新
+          scrollToTop() {
+            var that = this,
+              scrollTop = document.documentElement.scrollTop || document.body.scrollTop,
+              windowHeight = document.documentElement.clientHeight || document.body.clientHeight,
+              scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+            if (scrollTop + windowHeight == scrollHeight) {
+              that.page = that.page < 2 ? 2 : that.page += 1;
+              that.orderlistData();
+            } else {
+              // that.loading = true;
+            }
+          },
+        }
+      })
+    });
+  </script>
+</body>
+
+</html>

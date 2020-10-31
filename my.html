@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>个人中心</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <link rel="stylesheet" href="/static/index/libs/weui.min.css">
+  <link rel="stylesheet" href="/static/index/libs/jquery-weui.min.css">
+  <link rel="stylesheet" href="/static/index/libs/index.css">
+</head>
+
+<body class="bg-gray">
+  <div id="app" v-cloak v-if='userInfo'>
+    <div class="userinfo">
+      <div class="weui-cell">
+        <div class="weui-cell__hd"><img :src="userInfo.avatar"></div>
+        <div class="weui-cell__bd oneline">
+          <p class="text-bold oneline">{{userInfo.username}}</p>
+          <p class="text-df">再忙，也要记得饭哟~</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="weui_list bg-white">
+      <a class="item" href="order.html">
+        <div><img src="/static/index/images/i1.png" alt=""></div>
+        <div>我的报名</div>
+      </a>
+      <a class="item" href="reward.html">
+        <div><img src="/static/index/images/i2.png" alt=""></div>
+        <div>红包记录</div>
+      </a>
+      <a class="item" href="like.html">
+        <div><img src="/static/index/images/i3.png" alt=""></div>
+        <div>收藏店铺</div>
+      </a>
+    </div>
+    <!-- 规则 -->
+    <div class="rulebox bg-white" style="margin-bottom:0">
+      <div class="ruletitle">霸王餐规则</div>
+      <div class="rule"></div>
+    </div>
+    <!-- 联系我们 -->
+    <div class="foot">
+      <div class="text-center text-sm text-gray">
+        <a class="text-blue"  :href="'tel:'+aboutDataList" style="color: blue;">联系我们：{{aboutDataList}}</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/index/libs/jquery-2.1.4.js"></script>
+  <script src="/static/index/libs/fastclick.js"></script>
+  <script src="/static/index/libs/jquery-weui.min.js"></script>
+  <script src="/static/index/libs/vue.min.js"></script>
+  <script src="/static/index/libs/request.js"></script>
+  <script src="https://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+  <script>
+    $(function () {
+      FastClick.attach(document.body);
+      new Vue({
+        el: '#app',
+        data() {
+          return {
+            userInfo: {},
+            aboutDataList:{}
+          }
+        },
+        created() {
+          let that = this;
+          that.weChatSdk();
+          that.about();
+          if (!sessionStorage.getItem('token')) {
+            WechatLogin(window).then((res) => {
+              that.storeDetail(res);
+            }).catch((err) => {
+              console.log(err)
+            });
+          } else {
+            that.userInfo = JSON.parse(sessionStorage.getItem('userInfo'));
+          }
+        },
+        methods: {
+          // 登录
+          async storeDetail(code) {
+            let that = this;
+            try {
+              const user = await updateResturant({
+                'url': '/user/register',
+                data: {
+                  code
+                }
+              });
+              sessionStorage.setItem('token', user.data.tokens);
+              sessionStorage.setItem('userInfo', JSON.stringify(user.data));
+              that.userInfo = user.data;
+            } catch (error) {
+              console.log(error)
+            }
+          },
+          // js-sdk 
+          // 微信js-sdk 
+          async weChatSdk() {
+            let that = this;
+            try {
+              const sdk = await updateResturant({
+                'url': '/Wxjssdk/jssdk',
+                data: {
+                  url: window.location.href
+                }
+              });
+              const data = sdk.data;
+              wx.config({
+                debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+                appId: data.appId, // 必填，公众号的唯一标识
+                timestamp: data.timestamp, // 必填，生成签名的时间戳
+                nonceStr: data.nonceStr, // 必填，生成签名的随机串
+                signature: data.signature, // 必填，签名，见附录1
+                jsApiList: ['getLocation'] // 必填，需要使用的JS接口列表，所有JS接口列表见附录2
+              });
+              wx.ready(function () {
+                // 在这里调用 API
+                wx.checkJsApi({
+                  jsApiList: ['getLocation'],
+                  success: (res) => {
+                    console.log(res)
+                  }
+                });
+                wx.getLocation({
+                  type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                  success: function (res) {
+                    sessionStorage.setItem('getlication', JSON.stringify(res))
+                    that.getCityCode(res);
+                  }
+                });
+              });
+            } catch (error) {
+              console.log(error)
+            }
+          },
+          // 空白填充
+          async about(){
+            try {
+              const aboutData = await updateResturantGet({
+                'url':'/user/about',
+                data:{}
+              });
+             $('.rule').html(aboutData.data.bwc_rule);
+             this.aboutDataList = aboutData.data.mobile
+            } catch (error) {
+              
+            }
+          }
+        }
+      })
+    });
+  </script>
+</body>
+
+</html>

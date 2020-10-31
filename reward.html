@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>红包记录</title>
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <link rel="stylesheet" href="/static/index/libs/weui.min.css">
+  <link rel="stylesheet" href="/static/index/libs/jquery-weui.min.css">
+  <link rel="stylesheet" href="/static/index/libs/index.css">
+</head>
+
+<body class="bg-gray">
+  <div id="app" v-cloak>
+    <div class="reward margin-sm">
+      <div class="weui-cells bg-white radius shadow">
+        <div class="weui-cell" v-for='(item,index) in redLogList' :key='index'>
+          <div class="weui-cell__bd">
+            <p>{{item.store.name}}</p>
+            <p class="text-sm text-gray">{{manageTime(item.create_time)}}</p>
+          </div>
+          <span class="weui-cell__ft">+{{item.money}}</span>
+        </div>
+        <!-- 缺失页面 -->
+        <div class="padding-xl" v-if='redLogList.length==0'>
+          <div class="emptybox padding-lg text-center">
+            <img src="/static/index/images/empty.png">
+            <div class="text-ml">暂无信息~</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/index/libs/jquery-2.1.4.js"></script>
+  <script src="/static/index/libs/fastclick.js"></script>
+  <script src="/static/index/libs/jquery-weui.min.js"></script>
+  <script src="/static/index/libs/request.js"></script>
+  <script src="/static/index/libs/vue.min.js"></script>
+  <script>
+    $(function () {
+      FastClick.attach(document.body);
+      new Vue({
+        el: "#app",
+        data() {
+          return {
+            redLogList: [],
+            page: 1
+          }
+        },
+        created() {
+          this.redLogData();
+        },
+        methods: {
+          async redLogData() {
+            let that = this;
+            try {
+              const redLog = await updateResturant({
+                'url': '/order/redLog',
+                data: {
+                  page: that.page,
+                  size: 12
+                }
+              });
+              that.page > 1 ? that.redLogList.concat(redLog.data) : that.redLogList = redLog.data;
+            } catch (error) {
+
+            }
+          },
+          // 解析时间
+          manageTime(timestamp, num = 0) {
+            var date = new Date(timestamp * 1000);
+            var y = date.getFullYear();
+            var m = date.getMonth() + 1;
+            m = m < 10 ? ('0' + m) : m;
+            var d = date.getDate();
+            d = d < 10 ? ('0' + d) : d;
+            var h = date.getHours();
+            h = h < 10 ? ('0' + h) : h;
+            var minute = date.getMinutes();
+            var second = date.getSeconds();
+            minute = minute < 10 ? ('0' + minute) : minute;
+            second = second < 10 ? ('0' + second) : second;
+            if (num == 0) {
+              return y + '-' + m + '-' + d;
+            } else {
+              return y + '-' + m + '-' + d + ' ' + h + ':' + minute + ':' + second;
+            };
+          },
+          // 上拉刷新
+          scrollToTop() {
+            var that = this,
+              scrollTop = document.documentElement.scrollTop || document.body.scrollTop,
+              windowHeight = document.documentElement.clientHeight || document.body.clientHeight,
+              scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+            if (scrollTop + windowHeight == scrollHeight) {
+              that.page = that.page < 2 ? 2 : that.page += 1;
+              that.redLogData();
+            } else {
+              // that.loading = true;
+            }
+          },
+        }
+      })
+    });
+  </script>
+</body>
+
+</html>

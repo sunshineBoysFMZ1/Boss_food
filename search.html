@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>搜索</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="keywords" content="">
+  <meta name="description" content="">
+  <link rel="stylesheet" href="libs/weui.min.css">
+  <link rel="stylesheet" href="libs/jquery-weui.min.css">
+  <link rel="stylesheet" href="libs/index.css">
+</head>
+<body class="bg-gray">
+  <div class="in_topbox fixed search">
+    <div class="search-bar__box">
+      <i class="weui-icon-search"></i>
+      <input type="search" class="search-bar__input" id="searchInput" placeholder="搜索" required="">
+    </div>
+    <div class="btn">
+      <button>搜索</button>
+    </div>
+  </div>
+
+  <div class="picker">
+    <div class="item">
+      <select class="select" name="select">
+        <option value="1">品类</option>
+        <option value="2">美食</option>
+        <option value="3">小吃</option>
+        <option value="4">面食</option>
+      </select>
+      <img src="images/down.png">
+    </div>
+    <div class="item">
+      <select class="select" name="select">
+        <option value="1">区域</option>
+        <option value="2">二七区</option>
+        <option value="3">金水区</option>
+        <option value="4">中原区</option>
+      </select>
+      <img src="images/down.png">
+    </div>
+    <div class="item">
+      <select class="select" name="select">
+        <option value="1">距离</option>
+        <option value="2"></option>
+        <option value="3"></option>
+      </select>
+      <img src="images/down.png">
+    </div>
+    <div class="item">
+      <select class="select" name="select">
+        <option value="1">红包大小</option>
+        <option value="2">1-5</option>
+        <option value="3">5-10</option>
+        <option value="3">10-15</option>
+        <option value="3">15-20</option>
+      </select>
+      <img src="images/down.png">
+    </div>
+  </div>
+  <div class="shoplist">
+    <a class="shop_item" href="shop.html">
+      <div class="shopimg"><img src="images/shop.jpg"></div>
+      <div class="shop_info">
+        <div class="shop_head">
+          <div class="name">嘉和一品粥（国展店）</div>
+          <div class="progress_box none">
+            <div id="Value" class="slider_value">剩余名额:60</div>
+            <div class="weui-progress__bar">
+              <div class="weui-progress__inner-bar js_progress" style="width:70%;"></div>
+            </div>
+          </div>
+          <div class="signup"><i class="weui-icon-success"></i><span>已报名</span></div>
+        </div>
+        <div class="shop_tips"><p>粥</p><p>茶叶蛋</p><p>油条</p></div>
+        <div class="shop_money">
+          <div class="money">霸王餐5-10元</div>
+          <div class="distance">1.5km</div>
+        </div>
+      </div>
+    </a>
+    <div class="shop_item">
+      <div class="shopimg"><img src="images/shop.jpg"></div>
+      <div class="shop_info">
+        <div class="shop_head">
+          <div class="name">嘉和一品粥（国展店）</div>
+          <div class="progress_box">
+            <div id="Value" class="slider_value">剩余名额:60</div>
+            <div class="weui-progress__bar">
+              <div class="weui-progress__inner-bar js_progress" style="width:70%;"></div>
+            </div>
+          </div>
+          <div class="signup none"><i class="weui-icon-success"></i><span>已报名</span></div>
+        </div>
+        <div class="shop_tips"><p>粥</p><p>茶叶蛋</p><p>油条</p></div>
+        <div class="shop_money">
+          <div class="money">霸王餐5-10元</div>
+          <div class="distance">1.5km</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  
+<script src="libs/jquery-2.1.4.js"></script>
+<script src="libs/fastclick.js"></script>
+<script src="libs/jquery-weui.min.js"></script>
+<script src="libs/swiper.min.js"></script>
+<script>
+  $(function() {
+    FastClick.attach(document.body);
+  });
+</script>
+</body>
+</html>
